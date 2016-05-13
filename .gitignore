@@ -1,0 +1,7 @@
+build.pyc
+*/**.pyc
+.idea
+derby.log
+target
+*.iml
+.coverage
