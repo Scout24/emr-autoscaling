@@ -11,20 +11,75 @@ class EmrScalerTest(TestCase):
         self.threshold = 0.7
         self.emr = Emr(job_flow_id = "myJobFlow", region = "eu-west-1")
 
+    def test_before_3_pm_is_not_in_office_hours(self):
+        self.assertFalse (
+            EmrScaler (
+                self.emr,
+                office_hours_start = 15,
+                office_hours_end = 22
+            ).is_in_office_hours (
+                datetime(2016, 5, 4, 14, 59, 59)
+            )
+        )
+
     def test_before_7_am_is_not_in_office_hours(self):
         self.assertFalse(EmrScaler(self.emr).is_in_office_hours(datetime(2016, 5, 4, 6, 59, 59)))
 
     def test_at_7_am_is_in_office_hours(self):
         self.assertTrue(EmrScaler(self.emr).is_in_office_hours(datetime(2016, 5, 4, 7)))
 
+    def test_at_3_pm_is_in_office_hours(self):
+        self.assertTrue (
+            EmrScaler (
+                self.emr,
+                office_hours_start = 15,
+                office_hours_end = 22
+            ).is_in_office_hours (
+                datetime(2016, 5, 4, 15)
+            )
+        )
+
     def test_after_6_pm_is_not_in_office_hours(self):
         self.assertFalse(EmrScaler(self.emr).is_in_office_hours(datetime(2016, 5, 4, 18, 00, 01)))
+
+    def test_after_10_pm_is_not_in_office_hours(self):
+        self.assertFalse (
+            EmrScaler (
+                self.emr,
+                office_hours_start = 15,
+                office_hours_end = 22
+            ).is_in_office_hours (
+                datetime(2016, 5, 4, 22, 00, 01)
+            )
+        )
 
     def test_at_6_pm_is_in_office_hours(self):
         self.assertTrue(EmrScaler(self.emr).is_in_office_hours(datetime(2016, 5, 4, 18)))
 
+    def test_at_10_pm_is_in_office_hours(self):
+        self.assertTrue (
+            EmrScaler (
+                self.emr,
+                office_hours_start = 15,
+                office_hours_end = 22
+            ).is_in_office_hours (
+                datetime(2016, 5, 4, 22)
+            )
+        )
+
     def test_at_1_pm_is_in_office_hours(self):
         self.assertTrue(EmrScaler(self.emr).is_in_office_hours(datetime(2016, 5, 4, 13)))
+
+    def test_at_7_pm_is_in_office_hours(self):
+        self.assertTrue (
+            EmrScaler (
+                self.emr,
+                office_hours_start = 15,
+                office_hours_end = 22
+            ).is_in_office_hours (
+                datetime(2016, 5, 4, 19)
+            )
+        )
 
     def test_sunday_is_not_in_office_hours(self):
         self.assertFalse(EmrScaler(self.emr).is_in_office_hours(datetime(2016, 5, 1, 6)))

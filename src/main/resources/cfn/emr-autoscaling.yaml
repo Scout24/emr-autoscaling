@@ -16,6 +16,16 @@ Parameters:
     Type: "Number"
     Default: 20
     MinValue: 0
+  officeHoursStart:
+    Type: "Number"
+    Default: 0
+    MinValue: 0
+    MaxValue: 24
+  officeHoursEnd:
+    Type: "Number"
+    Default: 0
+    MinValue: 0
+    MaxValue: 24
 
 Resources:
   ScalingEventsRule:
@@ -46,6 +56,10 @@ Resources:
               - "|Ref|emrScalingMinInstances"
               - ", \"MaxInstances\": "
               - "|Ref|emrScalingMaxInstances"
+              - ", \"OfficeHoursStart\": "
+              - "|Ref|officeHoursStart"
+              - ", \"OfficeHoursEnd\": "
+              - "|Ref|officeHoursEnd"
               - "}"
   ScalingFunction:
     Type: "AWS::Lambda::Function"
