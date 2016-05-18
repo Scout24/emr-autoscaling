@@ -113,3 +113,11 @@ in the next section. You can override the defaults simply by adding
     - maximum number of instances that is allowed for each task instance group
     - integer >= 0
     - defaults to 20
+- officeHoursStart
+    - begin of office hour range during which no downscaling will be initiated
+    - integer between 0 and 24
+    - defaults to 8
+- officeHoursEnd
+    - end of office hour range during which no downscaling will be initiated
+    - integer between 0 and 24
+    - defaults to 18
