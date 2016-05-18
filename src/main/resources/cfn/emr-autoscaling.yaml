@@ -18,12 +18,12 @@ Parameters:
     MinValue: 0
   officeHoursStart:
     Type: "Number"
-    Default: 0
+    Default: 8
     MinValue: 0
     MaxValue: 24
   officeHoursEnd:
     Type: "Number"
-    Default: 0
+    Default: 18
     MinValue: 0
     MaxValue: 24
 
