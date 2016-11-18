@@ -2,6 +2,9 @@ import boto3
 from datetime import datetime, timedelta
 import logging
 
+import math
+
+
 class Emr:
 
     def __init__(self, job_flow_id, min_instances = 0, max_instances = 20, region = None):
@@ -74,14 +77,14 @@ class Emr:
                 return True
         return False
 
-    def scale(self, delta):
+    def scale(self, direction):
         groups = sorted (
             self.get_task_instance_groups(),
             key = lambda g: g["BidPrice"],
             reverse = True
         )
         for group in groups:
-            target_requested_instances = group["RequestedInstanceCount"] + delta
+            target_requested_instances = group["RequestedInstanceCount"] + math.ceil(direction * 0.2 * group["RequestedInstanceCount"])
             if self.min_instances <= target_requested_instances <= self.max_instances:
                 self.emr.modify_instance_groups (
                     InstanceGroups = [
