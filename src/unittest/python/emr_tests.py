@@ -244,7 +244,7 @@ class EmrTest(TestCase):
             max_instances = 10,
             region = "eu-west-1"
         ).scale (
-            delta = 1
+            direction = 1
         )
         mock_modify_instance_groups.assert_called_with (
             InstanceGroups = [
@@ -274,7 +274,7 @@ class EmrTest(TestCase):
             max_instances = 10,
             region = "eu-west-1"
         ).scale (
-            delta = 1
+            direction = 1
         )
         mock_modify_instance_groups.assert_not_called()
 
@@ -297,7 +297,7 @@ class EmrTest(TestCase):
             max_instances = 10,
             region = "eu-west-1"
         ).scale (
-            delta = -1
+            direction = -1
         )
         mock_modify_instance_groups.assert_not_called()
 
@@ -327,7 +327,7 @@ class EmrTest(TestCase):
             max_instances = 10,
             region = "eu-west-1"
         ).scale (
-            delta = 1
+            direction = 1
         )
         mock_modify_instance_groups.assert_called_once_with (
             InstanceGroups = [
