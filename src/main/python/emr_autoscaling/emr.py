@@ -84,7 +84,8 @@ class Emr:
             reverse = True
         )
         for group in groups:
-            target_requested_instances = int(group["RequestedInstanceCount"] + math.ceil(direction * 0.2 * group["RequestedInstanceCount"]))
+            roundfunc = math.ceil if direction == 1 else math.floor
+            target_requested_instances = int(group["RequestedInstanceCount"] + roundfunc(direction * 0.2 * group["RequestedInstanceCount"]))
             if self.min_instances <= target_requested_instances <= self.max_instances:
                 self.emr.modify_instance_groups (
                     InstanceGroups = [
