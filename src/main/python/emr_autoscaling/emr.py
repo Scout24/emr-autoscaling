@@ -78,7 +78,9 @@ class Emr:
         return False
 
     def is_termination_protected(self):
-        return self.emr.describe_cluster(ClusterId=self.job_flow_id)["Cluster"]["TerminationProtected"]
+        termination_protected = self.emr.describe_cluster(ClusterId=self.job_flow_id)["Cluster"]["TerminationProtected"]
+        self.logger.info("Is cluster %s termination protected? %s" % (self.job_flow_id, termination_protected))
+        return termination_protected
 
     def scale(self, direction):
         groups = sorted (

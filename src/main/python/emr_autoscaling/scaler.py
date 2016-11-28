@@ -68,6 +68,7 @@ class EmrScaler:
                 self.logger.info("Nothing to do, going back to sleep.")
 
     def maybe_shutdown(self):
+        self.logger.info("Parent stack: %s" % self.parent_stack)
         if self.is_after_shutdown_time() and not self.emr.is_termination_protected() and self.parent_stack:
             self.shutdown()
 
@@ -75,5 +76,6 @@ class EmrScaler:
         self.cloud_formation.delete_stack(StackName=self.parent_stack)
 
     def is_after_shutdown_time(self, time=datetime.now()):
+        self.logger.info("Current time: %s, shutdown time %s" % (time, self.shutdown_time))
         return self.shutdown_time <= time
 
