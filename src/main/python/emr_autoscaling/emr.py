@@ -77,6 +77,9 @@ class Emr:
                 return True
         return False
 
+    def is_termination_protected(self):
+        return self.emr.describe_cluster(ClusterId=self.job_flow_id)["Cluster"]["TerminationProtected"]
+
     def scale(self, direction):
         groups = sorted (
             self.get_task_instance_groups(),

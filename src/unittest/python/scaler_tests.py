@@ -180,3 +180,57 @@ class EmrScalerTest(TestCase):
         mock_should_scale_up.return_value = False
         EmrScaler(self.emr).maybe_scale(0.7)
         mock_scale.assert_not_called
+
+    @patch("emr_autoscaling.scaler.EmrScaler.shutdown")
+    @patch("emr_autoscaling.scaler.EmrScaler.is_after_shutdown_time")
+    def test_do_not_shutdown_if_too_early(self, mock_is_after_shutdown_time, mock_shutdown):
+        mock_is_after_shutdown_time.return_value = False
+        EmrScaler(self.emr).maybe_shutdown()
+        mock_shutdown.assert_not_called()
+
+    def test_is_before_shutdown_time (
+            self
+    ):
+        self.assertFalse(EmrScaler(self.emr).is_after_shutdown_time(datetime(2016, 1, 1, 22, 59, 59)))
+
+    def test_is_after_shutdown_time (
+            self
+    ):
+        self.assertFalse(EmrScaler(self.emr).is_after_shutdown_time(datetime(2016, 1, 1, 23, 0, 0)))
+
+    @patch("emr_autoscaling.emr.Emr.is_termination_protected")
+    @patch("emr_autoscaling.scaler.EmrScaler.shutdown")
+    @patch("emr_autoscaling.scaler.EmrScaler.is_after_shutdown_time")
+    def test_do_not_shutdown_if_no_parent_stack_given(self, mock_is_after_shutdown_time, mock_shutdown,
+                                                      mock_is_termination_protected):
+        mock_is_after_shutdown_time.return_value = True
+        mock_is_termination_protected.return_value = False
+        EmrScaler(self.emr, parent_stack=None).maybe_shutdown()
+        mock_shutdown.assert_not_called()
+
+    @patch("emr_autoscaling.emr.Emr.is_termination_protected")
+    @patch("emr_autoscaling.scaler.EmrScaler.shutdown")
+    @patch("emr_autoscaling.scaler.EmrScaler.is_after_shutdown_time")
+    def test_do_not_shutdown_if_termination_protected(self, mock_is_after_shutdown_time, mock_shutdown,
+                                                      mock_is_termination_protected):
+        mock_is_after_shutdown_time.return_value = True
+        mock_is_termination_protected.return_value = True
+        EmrScaler(self.emr, parent_stack="parent").maybe_shutdown()
+        mock_shutdown.assert_not_called()
+
+    @patch("emr_autoscaling.emr.Emr.is_termination_protected")
+    @patch("emr_autoscaling.scaler.EmrScaler.shutdown")
+    @patch("emr_autoscaling.scaler.EmrScaler.is_after_shutdown_time")
+    def test_shutdown_all_conditions_are_met(self, mock_is_after_shutdown_time, mock_shutdown,
+                                                      mock_is_termination_protected):
+        mock_is_after_shutdown_time.return_value = True
+        mock_is_termination_protected.return_value = False
+        EmrScaler(self.emr, parent_stack="parent").maybe_shutdown()
+        mock_shutdown.assert_called()
+
+    @patch("emr_autoscaling.emr.boto3.client")
+    def test_shutdown_deletes_stack(self, mock_client):
+        parent_stack = "parent"
+        mock_cf = mock_client.return_value.delete_stack
+        EmrScaler(self.emr, parent_stack=parent_stack).shutdown()
+        mock_cf.assert_called_with(StackName=parent_stack)

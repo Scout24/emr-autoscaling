@@ -337,3 +337,22 @@ class EmrTest(TestCase):
                 }
             ]
         )
+    @patch("emr_autoscaling.emr.boto3.client")
+    def test_is_termination_protected_True(self, mock_emr):
+        mock_describe_cluster = mock_emr.return_value.describe_cluster
+        mock_describe_cluster.return_value = {
+            "Cluster": {
+                "TerminationProtected": True
+            }
+        }
+        self.assertTrue(Emr(job_flow_id=self.job_flow).is_termination_protected())
+
+    @patch("emr_autoscaling.emr.boto3.client")
+    def test_is_termination_protected_False(self, mock_emr):
+        mock_describe_cluster = mock_emr.return_value.describe_cluster
+        mock_describe_cluster.return_value = {
+            "Cluster": {
+                "TerminationProtected": False
+            }
+        }
+        self.assertFalse(Emr(job_flow_id=self.job_flow).is_termination_protected())
