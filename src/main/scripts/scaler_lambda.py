@@ -22,7 +22,7 @@ def lambda_handler(event, context):
         office_hours_start = office_hours_start,
         office_hours_end = office_hours_end,
         shutdown_time=shutdown_time,
-        parent_stack_id=parent_stack_id
+        parent_stack=parent_stack_id
     )
     scaler.maybe_shutdown()
     scaler.maybe_scale(threshold)
