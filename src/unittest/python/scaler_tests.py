@@ -234,4 +234,4 @@ class EmrScalerTest(TestCase):
         stack_deletion_role = "aws:iam:foo:bar"
         mock_cf = mock_client.return_value.delete_stack
         EmrScaler(self.emr, parent_stack=parent_stack, stack_deletion_role=stack_deletion_role).shutdown()
-        mock_cf.assert_called_with(StackName=parent_stack, RoleArn=stack_deletion_role)
+        mock_cf.assert_called_with(StackName=parent_stack, RoleARN=stack_deletion_role)
