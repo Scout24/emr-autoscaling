@@ -231,6 +231,7 @@ class EmrScalerTest(TestCase):
     @patch("emr_autoscaling.emr.boto3.client")
     def test_shutdown_deletes_stack(self, mock_client):
         parent_stack = "parent"
+        stack_deletion_role = "aws:iam:foo:bar"
         mock_cf = mock_client.return_value.delete_stack
-        EmrScaler(self.emr, parent_stack=parent_stack).shutdown()
-        mock_cf.assert_called_with(StackName=parent_stack)
+        EmrScaler(self.emr, parent_stack=parent_stack, stack_deletion_role=stack_deletion_role).shutdown()
+        mock_cf.assert_called_with(StackName=parent_stack, RoleArn=stack_deletion_role)

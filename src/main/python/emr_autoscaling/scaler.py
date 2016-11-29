@@ -4,7 +4,8 @@ import boto3
 
 class EmrScaler:
 
-    def __init__(self, emr, min_instances = 0, max_instances = 20, office_hours_start = 7, office_hours_end = 18, shutdown_time = 23, parent_stack = None):
+    def __init__(self, emr, min_instances=0, max_instances=20, office_hours_start=7, office_hours_end=18,
+                 shutdown_time=23, parent_stack=None, stack_deletion_role=None):
         self.min_instances = min_instances
         self.max_instances = max_instances
         self.office_hours_start = office_hours_start
@@ -15,6 +16,7 @@ class EmrScaler:
         self.shutdown_time = datetime.now().replace(hour=shutdown_time, minute=0, second=0, microsecond=0)
         self.parent_stack = parent_stack
         self.cloud_formation = boto3.client('cloudformation')
+        self.stack_deletion_role = stack_deletion_role
 
     def is_in_office_hours(self, curr_time = datetime.now()):
         return (
@@ -73,7 +75,7 @@ class EmrScaler:
             self.shutdown()
 
     def shutdown(self):
-        self.cloud_formation.delete_stack(StackName=self.parent_stack)
+        self.cloud_formation.delete_stack(StackName=self.parent_stack, RoleArn=self.stack_deletion_role)
 
     def is_after_shutdown_time(self, time=datetime.now()):
         self.logger.info("Current time: %s, shutdown time %s" % (time, self.shutdown_time))
