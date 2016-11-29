@@ -77,7 +77,8 @@ class EmrScaler:
     def shutdown(self):
         self.cloud_formation.delete_stack(StackName=self.parent_stack, RoleArn=self.stack_deletion_role)
 
-    def is_after_shutdown_time(self, time=datetime.now()):
+    def is_after_shutdown_time(self, time=None):
+        time = time or datetime.now()
         self.logger.info("Current time: %s, shutdown time %s" % (time, self.shutdown_time))
         return self.shutdown_time <= time
 
