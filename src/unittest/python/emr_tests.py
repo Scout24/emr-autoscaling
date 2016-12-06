@@ -257,6 +257,66 @@ class EmrTest(TestCase):
 
     @patch("emr_autoscaling.emr.boto3.client")
     @patch("emr_autoscaling.emr.Emr.get_task_instance_groups")
+    def test_scaling_up_from_zero_instances(self, mock_get_task_instance_group, mock_emr):
+        mock_get_task_instance_group.return_value = [
+            {
+                "Id": self.emr_task_instance_group_id,
+                "RequestedInstanceCount": 0,
+                "BidPrice": 1.2,
+                "Name": self.emr_task_instance_group_name,
+                "InstanceType": self.emr_task_instance_group_instance_type
+            }
+        ]
+        mock_modify_instance_groups = mock_emr.return_value.modify_instance_groups
+        Emr (
+            job_flow_id = self.job_flow,
+            min_instances = 0,
+            max_instances = 10,
+            region = "eu-west-1"
+        ).scale (
+            direction = 1
+        )
+        mock_modify_instance_groups.assert_called_with (
+            InstanceGroups = [
+                {
+                    "InstanceGroupId": self.emr_task_instance_group_id,
+                    "InstanceCount": 1
+                }
+            ]
+        )
+
+    @patch("emr_autoscaling.emr.boto3.client")
+    @patch("emr_autoscaling.emr.Emr.get_task_instance_groups")
+    def test_scaling_down_from_one_instance(self, mock_get_task_instance_group, mock_emr):
+        mock_get_task_instance_group.return_value = [
+            {
+                "Id": self.emr_task_instance_group_id,
+                "RequestedInstanceCount": 1,
+                "BidPrice": 1.2,
+                "Name": self.emr_task_instance_group_name,
+                "InstanceType": self.emr_task_instance_group_instance_type
+            }
+        ]
+        mock_modify_instance_groups = mock_emr.return_value.modify_instance_groups
+        Emr (
+            job_flow_id = self.job_flow,
+            min_instances = 0,
+            max_instances = 10,
+            region = "eu-west-1"
+        ).scale (
+            direction = -1
+        )
+        mock_modify_instance_groups.assert_called_with (
+            InstanceGroups = [
+                {
+                    "InstanceGroupId": self.emr_task_instance_group_id,
+                    "InstanceCount": 0
+                }
+            ]
+        )
+
+    @patch("emr_autoscaling.emr.boto3.client")
+    @patch("emr_autoscaling.emr.Emr.get_task_instance_groups")
     def test_no_scaling_because_above_upper_bound(self, mock_get_task_instance_group, mock_emr):
         mock_get_task_instance_group.return_value = [
             {

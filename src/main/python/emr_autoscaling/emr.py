@@ -82,6 +82,14 @@ class Emr:
         self.logger.info("Is cluster %s termination protected? %s" % (self.job_flow_id, termination_protected))
         return termination_protected
 
+    @staticmethod
+    def calculate_new_instance_count(current_instance_count, direction):
+        if current_instance_count == 0 and direction == 1:
+            return 1
+
+        roundfunc = math.ceil if direction == 1 else math.floor
+        return int(current_instance_count + roundfunc(direction * 0.2 * current_instance_count))
+
     def scale(self, direction):
         groups = sorted (
             self.get_task_instance_groups(),
@@ -89,8 +97,7 @@ class Emr:
             reverse = True
         )
         for group in groups:
-            roundfunc = math.ceil if direction == 1 else math.floor
-            target_requested_instances = int(group["RequestedInstanceCount"] + roundfunc(direction * 0.2 * group["RequestedInstanceCount"]))
+            target_requested_instances = self.calculate_new_instance_count(group['RequestedInstanceCount'], direction)
             if self.min_instances <= target_requested_instances <= self.max_instances:
                 self.emr.modify_instance_groups (
                     InstanceGroups = [
