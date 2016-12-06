@@ -1,6 +1,7 @@
 from datetime import datetime
 import logging
 import boto3
+from constants import UP, DOWN
 
 class EmrScaler:
 
@@ -63,9 +64,9 @@ class EmrScaler:
             scale_down_needed = self.should_scale_down(threshold)
             scale_up_needed = self.should_scale_up()
             if scale_up_needed:
-                self.emr.scale(1)
+                self.emr.scale(UP)
             elif scale_down_needed:
-                self.emr.scale(-1)
+                self.emr.scale(DOWN)
             else:
                 self.logger.info("Nothing to do, going back to sleep.")
 

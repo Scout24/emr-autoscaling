@@ -1,5 +1,6 @@
 import boto3
 from datetime import datetime, timedelta
+from constants import UP
 import logging
 
 import math
@@ -84,10 +85,10 @@ class Emr:
 
     @staticmethod
     def calculate_new_instance_count(current_instance_count, direction):
-        if current_instance_count == 0 and direction == 1:
+        if current_instance_count == 0 and direction == UP:
             return 1
 
-        roundfunc = math.ceil if direction == 1 else math.floor
+        roundfunc = math.ceil if direction == UP else math.floor
         return int(current_instance_count + roundfunc(direction * 0.2 * current_instance_count))
 
     def scale(self, direction):
