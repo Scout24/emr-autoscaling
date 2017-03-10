@@ -45,8 +45,17 @@ pyb -X package_lambda_code
 ```
 
 # Deployment
+## automatic way
+### deploy changes to AWS
+committing changes triggers a teamcity build
 
-## Upload Lambda Function to S3
+[Link to teamcity build](https://teamcity.rz.is/viewType.html?buildTypeId=DataScience_EmrAutoscaling)
+
+### update lambda function code
+```aws lambda update-function-code --function-name insights-cluster-AutoscalingStack-ScalingFunction-6YKMEWZ2YOPQ --region eu-west-1 --s3-bucket is24-data-pro-artifacts --s3-key emr/lambda_autoscaling/latest/emr-autoscaling.zip```
+
+## semi-manual way
+### Upload Lambda Function to S3
 
 To upload the lambda Function to S3, run the following command with your S3 bucket name:
 
@@ -60,7 +69,7 @@ previously into the S3 bucket as specified with the `bucket_name` parameter. The
 copies the uploaded file from `emr/lambda_autoscaling/<project-version>/emr-autoscaling.zip`
 to `/emr/lambda_autoscaling/latest/emr-autoscaling.zip`.
 
-## (Re-)Deploy Cloudformation Stack
+### (Re-)Deploy Cloudformation Stack
 
 The Cloudformation Stacks are deployed using [cfn-sphere](https://github.com/cfn-sphere/cfn-sphere).
 Since you cannot update lambda functions with Cloudformation (i.e. with new code), it is
