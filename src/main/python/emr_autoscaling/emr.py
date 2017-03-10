@@ -91,6 +91,10 @@ class Emr:
         roundfunc = math.ceil if direction == UP else math.floor
         return int(current_instance_count + roundfunc(direction * 0.2 * current_instance_count))
 
+    @staticmethod
+    def is_target_count_not_reached(current_requested_instances, target_requested_instances):
+        return current_requested_instances != target_requested_instances
+
     def scale(self, direction):
         groups = sorted (
             self.get_task_instance_groups(),
@@ -98,8 +102,10 @@ class Emr:
             reverse = True
         )
         for group in groups:
+            current_requested_instances = group['RequestedInstanceCount']
             target_requested_instances = self.calculate_new_instance_count(group['RequestedInstanceCount'], direction)
-            if self.min_instances <= target_requested_instances <= self.max_instances:
+
+            if self.is_target_count_not_reached(current_requested_instances, target_requested_instances) and self.min_instances <= target_requested_instances <= self.max_instances:
                 self.emr.modify_instance_groups (
                     InstanceGroups = [
                         {

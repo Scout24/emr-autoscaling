@@ -416,3 +416,6 @@ class EmrTest(TestCase):
             }
         }
         self.assertFalse(Emr(job_flow_id=self.job_flow).is_termination_protected())
+
+    def test_is_target_already_reached(self):
+        self.assertFalse(Emr.is_target_count_not_reached(0, 0))
