@@ -16,7 +16,7 @@ class EmrScaler:
         self.emr = emr
         self.shutdown_time = datetime.now().replace(hour=shutdown_time, minute=0, second=0, microsecond=0)
         self.parent_stack = parent_stack
-        self.cloud_formation = boto3.client('cloudformation')
+        self.cloud_formation = boto3.client('cloudformation', 'eu-west-1')
         self.stack_deletion_role = stack_deletion_role
 
     def is_in_office_hours(self, curr_time = datetime.now()):
