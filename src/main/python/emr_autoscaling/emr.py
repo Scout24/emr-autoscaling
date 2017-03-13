@@ -105,7 +105,8 @@ class Emr:
             current_requested_instances = group['RequestedInstanceCount']
             target_requested_instances = self.calculate_new_instance_count(group['RequestedInstanceCount'], direction)
 
-            if self.is_target_count_not_reached(current_requested_instances, target_requested_instances) and self.min_instances <= target_requested_instances <= self.max_instances:
+            if self.is_target_count_not_reached(current_requested_instances, target_requested_instances) \
+                    and self.min_instances <= target_requested_instances <= self.max_instances:
                 self.emr.modify_instance_groups (
                     InstanceGroups = [
                         {
@@ -125,8 +126,8 @@ class Emr:
             else:
                 self.logger.info (
                     "[{}   --   {}] New number of task instances is {}, out of bounds of ({}-{})".format (
-                        group["Name"],
-                        group["InstanceType"],
+                        group.get("Name", "dummy group name"),
+                        group.get("InstanceType", "dummy instance type"),
                         target_requested_instances,
                         self.min_instances,
                         self.max_instances
