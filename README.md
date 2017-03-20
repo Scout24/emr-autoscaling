@@ -52,7 +52,12 @@ committing changes triggers a teamcity build
 [Link to teamcity build](https://teamcity.rz.is/viewType.html?buildTypeId=DataScience_EmrAutoscaling)
 
 ### update lambda function code
-```aws lambda update-function-code --function-name insights-cluster-AutoscalingStack-ScalingFunction-6YKMEWZ2YOPQ --region eu-west-1 --s3-bucket is24-data-pro-artifacts --s3-key emr/lambda_autoscaling/latest/emr-autoscaling.zip```
+after the teamcity build has finished, run
+
+
+```aws lambda update-function-code --function-name insights-cluster-AutoscalingStack-ScalingFunction-<CURRENT_ID> --region eu-west-1 --s3-bucket is24-data-pro-artifacts --s3-key emr/lambda_autoscaling/latest/emr-autoscaling.zip```
+
+on aws cli
 
 ## semi-manual way
 ### Upload Lambda Function to S3
