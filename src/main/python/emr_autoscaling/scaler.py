@@ -19,7 +19,12 @@ class EmrScaler:
         self.cloud_formation = boto3.client('cloudformation')
         self.stack_deletion_role = stack_deletion_role
 
-    def is_in_office_hours(self, curr_time = datetime.now()):
+    def is_in_office_hours(self, curr_time):
+        self.logger.info("it is now {HOUR}:{MINUTE} on {WEEKDAY} ({DAY_NUMBER})"
+                         .format(HOUR=curr_time.hour, MINUTE=curr_time.minute,
+                                 WEEKDAY=curr_time.strftime("%A"), DAY_NUMBER=curr_time.weekday()))
+        self.logger.info("office hours are from {OFFICE_HOURS_START} until {OFFICE_HOURS_END}"
+                         .format(OFFICE_HOURS_START=self.office_hours_start, OFFICE_HOURS_END=self.office_hours_end))
         return (
             curr_time.hour >= self.office_hours_start and (
                 curr_time.hour < self.office_hours_end or
@@ -32,7 +37,7 @@ class EmrScaler:
     def should_scale_down(self, threshold):
         memory_used_ratio = self.emr.get_average_of_last_hour("MemoryAllocatedMB") / self.emr.get_average_of_last_hour("MemoryTotalMB")
         if memory_used_ratio <= threshold:
-            if self.is_in_office_hours():
+            if self.is_in_office_hours(datetime.now()):
                 self.logger.info (
                     "Memory used ratio {} is below threshold of {}, but won't scale down due to office hours.".format (
                         memory_used_ratio, threshold
@@ -61,8 +66,8 @@ class EmrScaler:
         if self.emr.scaling_in_progress():
             self.logger.info("Scaling is already running, doing nothing.")
         else:
-            scale_down_needed = self.should_scale_down(threshold)
             scale_up_needed = self.should_scale_up()
+            scale_down_needed = self.should_scale_down(threshold)
             if scale_up_needed:
                 self.emr.scale(UP)
             elif scale_down_needed:
