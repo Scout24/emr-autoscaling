@@ -1,4 +1,5 @@
 from datetime import datetime
+from pytz import timezone
 import logging
 import boto3
 from constants import UP, DOWN
@@ -14,7 +15,8 @@ class EmrScaler:
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.INFO)
         self.emr = emr
-        self.shutdown_time = datetime.now().replace(hour=shutdown_time, minute=0, second=0, microsecond=0)
+        self.time_zone = timezone('Europe/Berlin')
+        self.shutdown_time = datetime.now(self.time_zone).replace(hour=shutdown_time, minute=0, second=0, microsecond=0)
         self.parent_stack = parent_stack
         self.cloud_formation = boto3.client('cloudformation')
         self.stack_deletion_role = stack_deletion_role
@@ -37,7 +39,7 @@ class EmrScaler:
     def should_scale_down(self, threshold):
         memory_used_ratio = self.emr.get_average_of_last_hour("MemoryAllocatedMB") / self.emr.get_average_of_last_hour("MemoryTotalMB")
         if memory_used_ratio <= threshold:
-            if self.is_in_office_hours(datetime.now()):
+            if self.is_in_office_hours(datetime.now(self.time_zone)):
                 self.logger.info (
                     "Memory used ratio {} is below threshold of {}, but won't scale down due to office hours.".format (
                         memory_used_ratio, threshold
@@ -84,7 +86,7 @@ class EmrScaler:
         self.cloud_formation.delete_stack(StackName=self.parent_stack, RoleARN=self.stack_deletion_role)
 
     def is_after_shutdown_time(self, time=None):
-        time = time or datetime.now()
+        time = time or datetime.now(self.time_zone)
         self.logger.info("Current time: %s, shutdown time %s" % (time, self.shutdown_time))
         return self.shutdown_time <= time
 
