@@ -191,12 +191,12 @@ class EmrScalerTest(TestCase):
     def test_is_before_shutdown_time (
             self
     ):
-        self.assertFalse(EmrScaler(self.emr).is_after_shutdown_time(datetime(2016, 1, 1, 22, 59, 59)))
+        self.assertFalse(EmrScaler(self.emr).is_after_shutdown_time(datetime(2019, 10, 23, 22, 59, 59)))
 
     def test_is_after_shutdown_time (
             self
     ):
-        self.assertFalse(EmrScaler(self.emr).is_after_shutdown_time(datetime(2016, 1, 1, 23, 0, 0)))
+        self.assertTrue(EmrScaler(self.emr).is_after_shutdown_time(datetime(2019, 10, 23, 23, 0, 0)))
 
     @patch("emr_autoscaling.emr.Emr.is_termination_protected")
     @patch("emr_autoscaling.scaler.EmrScaler.shutdown")
