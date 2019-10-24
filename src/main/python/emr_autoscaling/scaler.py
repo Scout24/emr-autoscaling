@@ -90,7 +90,6 @@ class EmrScaler:
     def is_after_shutdown_time(self, time=None):
         time = time or datetime.now()
         time = self.time_zone.localize(time)
-        print("Current time: %s, shutdown time %s" % (time, self.shutdown_time))
         self.logger.info("Current time: %s, shutdown time %s" % (time, self.shutdown_time))
         return self.shutdown_time <= time
 
