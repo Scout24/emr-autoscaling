@@ -16,7 +16,9 @@ class EmrScaler:
         self.logger.setLevel(logging.INFO)
         self.emr = emr
         self.time_zone = timezone('Europe/Berlin')
-        self.shutdown_time = datetime.now(self.time_zone).replace(hour=shutdown_time, minute=0, second=0, microsecond=0)
+        #Calculating offset of timezone to subtract from the shutdown time
+        self.time_offset = int(datetime.now(self.time_zone).utcoffset().total_seconds()/60/60)
+        self.shutdown_time = datetime.now(self.time_zone).replace(hour=shutdown_time - self.time_offset, minute=0, second=0, microsecond=0)
         self.parent_stack = parent_stack
         self.cloud_formation = boto3.client('cloudformation')
         self.stack_deletion_role = stack_deletion_role
@@ -88,6 +90,7 @@ class EmrScaler:
     def is_after_shutdown_time(self, time=None):
         time = time or datetime.now()
         time = self.time_zone.localize(time)
+        print("Current time: %s, shutdown time %s" % (time, self.shutdown_time))
         self.logger.info("Current time: %s, shutdown time %s" % (time, self.shutdown_time))
         return self.shutdown_time <= time
 
