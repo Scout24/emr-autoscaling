@@ -30,7 +30,7 @@ pipeline {
 
     stages {
         stage('Test & Package') {
-            agent { node { label 'is24-data-dev-build' } }
+            agent { node { label 'is24-data-pro-build-data-engineering' } }
             steps {
                 script {
                     sh '''
@@ -45,7 +45,7 @@ pipeline {
                 beforeAgent true
                 branch 'master'
             }
-            agent { node { label 'is24-data-dev-build' } }
+            agent { node { label 'is24-data-pro-build-data-engineering' } }
             steps {
                 sh '''
                     aws s3 cp $S3_ZIP_ARTIFACT_PATH $S3_ZIP_ARTIFACT_PATH_LATEST
