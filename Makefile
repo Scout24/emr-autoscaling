@@ -2,8 +2,8 @@
 
 setup-environment: ## Prepare local environment for testing purposes, also used in Fizz
 	pip3 install virtualenv==20.0.31
-	virtualenv env --system-site-packages
-	source env/bin/activate; \
+	virtualenv venv --system-site-packages
+	source venv/bin/activate; \
 	pip3 install -r requirements.txt
 
 test: setup-environment ## Run unit tests
@@ -13,12 +13,3 @@ test: setup-environment ## Run unit tests
 package: test ## Build deployment package
 	source venv/bin/activate; \
     	python package.py
-
-prod-package: ## For Jenkins
-	pip3 install virtualenv==20.0.31
-	virtualenv env --system-site-packages
-	source env/bin/activate; \
-	pip3 install -r requirements.txt; \
-	source venv/bin/activate; \
-	PYTHONPATH=./src python -m unittest discover -s src/test/ -p '*_tests.py' -v \
-	python package.py

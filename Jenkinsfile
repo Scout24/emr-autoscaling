@@ -34,7 +34,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        make prod-package
+                        make package
                         aws s3 cp $LOCAL_ZIP_PATH $S3_ZIP_ARTIFACT_PATH
                     '''
                 }
