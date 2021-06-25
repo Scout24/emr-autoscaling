@@ -1,6 +1,6 @@
 import boto3
 from datetime import datetime, timedelta
-from constants import UP
+from .constants import UP
 import logging
 
 import math
@@ -65,22 +65,20 @@ class Emr:
         return stats["Datapoints"][0]["Maximum"]
 
     def get_task_instance_groups(self):
-        instance_groups = self.emr.list_instance_groups(ClusterId = self.job_flow_id)["InstanceGroups"]
-        return filter (
-            lambda g: g.has_key("BidPrice") and g["InstanceGroupType"] == "TASK",
-            instance_groups
-        )
+        instance_groups = self.emr.list_instance_groups(ClusterId=self.job_flow_id)["InstanceGroups"]
+        return [g for g in instance_groups if "BidPrice" in g and g["InstanceGroupType"] == "TASK"]
 
     def scaling_in_progress(self):
         groups = self.get_task_instance_groups()
         for group in groups:
             if group["RequestedInstanceCount"] != group["RunningInstanceCount"]:
                 return True
+
         return False
 
     def is_termination_protected(self):
         termination_protected = self.emr.describe_cluster(ClusterId=self.job_flow_id)["Cluster"]["TerminationProtected"]
-        self.logger.info("Is cluster %s termination protected? %s" % (self.job_flow_id, termination_protected))
+        print("Is cluster %s termination protected? %s" % (self.job_flow_id, termination_protected))
         return termination_protected
 
     @staticmethod
@@ -98,8 +96,8 @@ class Emr:
     def scale(self, direction):
         groups = sorted (
             self.get_task_instance_groups(),
-            key = lambda g: g["BidPrice"],
-            reverse = True
+            key=lambda g: g["BidPrice"],
+            reverse=True
         )
         for group in groups:
             current_requested_instances = group['RequestedInstanceCount']
@@ -123,13 +121,13 @@ class Emr:
                     )
                 )
                 break
-            else:
-                self.logger.info (
-                    "[{}   --   {}] New number of task instances is {}, out of bounds of ({}-{})".format (
-                        group.get("Name", "dummy group name"),
-                        group.get("InstanceType", "dummy instance type"),
-                        target_requested_instances,
-                        self.min_instances,
-                        self.max_instances
-                    )
+
+            self.logger.info(
+                "[{}   --   {}] New number of task instances is {}, out of bounds of ({}-{})".format (
+                    group.get("Name", "dummy group name"),
+                    group.get("InstanceType", "dummy instance type"),
+                    target_requested_instances,
+                    self.min_instances,
+                    self.max_instances
                 )
+            )

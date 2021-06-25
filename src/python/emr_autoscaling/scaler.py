@@ -1,8 +1,9 @@
 from datetime import datetime
-from pytz import timezone
+from src.python.pytz import timezone
 import logging
 import boto3
-from constants import UP, DOWN
+from .constants import UP, DOWN
+
 
 class EmrScaler:
 
@@ -48,15 +49,13 @@ class EmrScaler:
                     )
                 )
                 return False
-            else:
-                self.logger.info (
-                    "Memory used ratio {} is below threshold of {}, should scale down.".format (
-                        memory_used_ratio, threshold
-                    )
+            self.logger.info (
+                "Memory used ratio {} is below threshold of {}, should scale down.".format (
+                    memory_used_ratio, threshold
                 )
-                return True
-        else:
-            return False
+            )
+            return True
+        return False
 
     def should_scale_up(self):
         container_pending = self.emr.get_pending_containers()
@@ -91,5 +90,5 @@ class EmrScaler:
         time = time or datetime.now()
         time = self.time_zone.localize(time)
         self.logger.info("Current time: %s, shutdown time %s" % (time, self.shutdown_time))
-        return self.shutdown_time <= time
+        return self.shutdown_time.time() <= time.time()
 
