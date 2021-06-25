@@ -181,7 +181,7 @@ class EmrScalerTest(TestCase):
         new_time = datetime(2019, 10, 23, 23, 0, 1)
         delta = datetime.fromtimestamp(new_time.timestamp()) - datetime.utcfromtimestamp(new_time.timestamp())
 
-        print(f'\n\n---------\n{EmrScaler(self.emr).shutdown_time}\n{new_time}\n{EmrScaler(self.emr).shutdown_time.time() - new_time.time()}')
+        print(f'\n\n---------\n{EmrScaler(self.emr).shutdown_time}\n{new_time}\n{new_time - delta}')
 
         self.assertTrue(EmrScaler(self.emr).is_after_shutdown_time(new_time - delta))
 
