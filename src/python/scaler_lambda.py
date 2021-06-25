@@ -13,16 +13,16 @@ def lambda_handler(event, context):
 
     parent_stack_id = event["ParentStackId"] if "ParentStackId" in event else None
     stack_deletion_role = event["StackDeletionRole"] if "StackDeletionRole" in event else None
-    scaler = EmrScaler (
-        emr = Emr (
-            job_flow_id = job_flow_id,
-            min_instances = min_instances,
-            max_instances = max_instances
+    scaler = EmrScaler(
+        emr=Emr(
+            job_flow_id=job_flow_id,
+            min_instances=min_instances,
+            max_instances=max_instances
         ),
-        min_instances = min_instances,
-        max_instances = max_instances,
-        office_hours_start = office_hours_start,
-        office_hours_end = office_hours_end,
+        min_instances=min_instances,
+        max_instances=max_instances,
+        office_hours_start=office_hours_start,
+        office_hours_end=office_hours_end,
         shutdown_time=shutdown_time,
         parent_stack=parent_stack_id,
         stack_deletion_role=stack_deletion_role
