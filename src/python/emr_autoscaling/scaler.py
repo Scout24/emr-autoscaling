@@ -2,6 +2,7 @@ from datetime import datetime
 from src.python.pytz import timezone
 import logging
 import boto3
+from .utils import get_logger
 from .constants import UP, DOWN
 
 
@@ -13,8 +14,7 @@ class EmrScaler:
         self.max_instances = max_instances
         self.office_hours_start = office_hours_start
         self.office_hours_end = office_hours_end
-        self.logger = logging.getLogger()
-        self.logger.setLevel(logging.INFO)
+        self.logger = get_logger('EMRScaler')
         self.emr = emr
         self.time_zone = timezone('Europe/Berlin')
         #Calculating offset of timezone to subtract from the shutdown time

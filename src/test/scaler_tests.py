@@ -173,17 +173,15 @@ class EmrScalerTest(TestCase):
 
     def test_is_before_shutdown_time(self):
         new_time = datetime(2019, 10, 23, 22, 59, 59)
-        delta = datetime.fromtimestamp(new_time.timestamp()) - datetime.utcfromtimestamp(new_time.timestamp())
+        new_time = datetime.utcfromtimestamp(new_time.timestamp())
 
-        self.assertFalse(EmrScaler(self.emr).is_after_shutdown_time(new_time - delta))
+        self.assertFalse(EmrScaler(self.emr).is_after_shutdown_time(new_time))
 
     def test_is_after_shutdown_time(self):
         new_time = datetime(2019, 10, 23, 23, 0, 1)
-        delta = datetime.fromtimestamp(new_time.timestamp()) - datetime.utcfromtimestamp(new_time.timestamp())
+        new_time = datetime.utcfromtimestamp(new_time.timestamp())
 
-        print(f'\n\n---------\n{EmrScaler(self.emr).shutdown_time}\n{new_time}\n{new_time - delta}')
-
-        self.assertTrue(EmrScaler(self.emr).is_after_shutdown_time(new_time - delta))
+        self.assertTrue(EmrScaler(self.emr).is_after_shutdown_time(new_time))
 
     @patch(f"{MODULE_BASE}.emr.Emr.is_termination_protected")
     @patch(f"{MODULE_BASE}.scaler.EmrScaler.shutdown")

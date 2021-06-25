@@ -1,7 +1,7 @@
 import boto3
 from datetime import datetime, timedelta
 from .constants import UP
-import logging
+from .utils import get_logger
 
 import math
 
@@ -12,8 +12,7 @@ class Emr:
         self.min_instances = min_instances
         self.max_instances = max_instances
         self.job_flow_id = job_flow_id
-        self.logger = logging.getLogger()
-        self.logger.setLevel(logging.INFO)
+        self.logger = get_logger('EMR')
         if region:
             self.emr = boto3.client("emr", region_name = region)
             self.cloudwatch = boto3.client("cloudwatch", region_name = region)
@@ -78,7 +77,7 @@ class Emr:
 
     def is_termination_protected(self):
         termination_protected = self.emr.describe_cluster(ClusterId=self.job_flow_id)["Cluster"]["TerminationProtected"]
-        print("Is cluster %s termination protected? %s" % (self.job_flow_id, termination_protected))
+        self.logger.info("Is cluster %s termination protected? %s" % (self.job_flow_id, termination_protected))
         return termination_protected
 
     @staticmethod
