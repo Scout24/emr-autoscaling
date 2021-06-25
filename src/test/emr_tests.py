@@ -1,8 +1,12 @@
 from datetime import datetime, timedelta
 
-from emr_autoscaling.emr import Emr
+from src.python.emr_autoscaling.emr import Emr
 from mock import patch
 from unittest import TestCase
+
+
+MODULE_BASE = "src.python.emr_autoscaling"
+
 
 class EmrTest(TestCase):
 
@@ -14,7 +18,7 @@ class EmrTest(TestCase):
         self.emr_task_instance_group_name = "MyTaskInstanceGroupName"
         self.emr_task_instance_group_instance_type = "MyTaskInstanceGroupInstanceType"
 
-    @patch("emr_autoscaling.emr.boto3.client")
+    @patch(f"{MODULE_BASE}.emr.boto3.client")
     def test_returns_average_of_last_hour(self, mock_cw):
         mock_stats = mock_cw.return_value.get_metric_statistics
         mock_stats.return_value = {
@@ -45,7 +49,7 @@ class EmrTest(TestCase):
             ]
         )
 
-    @patch("emr_autoscaling.emr.boto3.client")
+    @patch(f"{MODULE_BASE}.emr.boto3.client")
     def test_gets_pending_containers(self, mock_cw):
         mock_stats = mock_cw.return_value.get_metric_statistics
         mock_stats.return_value = {
@@ -76,7 +80,7 @@ class EmrTest(TestCase):
             ]
         )
 
-    @patch("emr_autoscaling.emr.boto3.client")
+    @patch(f"{MODULE_BASE}.emr.boto3.client")
     def test_get_one_task_instance_group(self, mock_emr):
         mock_instance_groups = mock_emr.return_value.list_instance_groups
         mock_instance_groups.return_value = {
@@ -105,7 +109,7 @@ class EmrTest(TestCase):
         )
         mock_instance_groups.assert_called_with(ClusterId = self.job_flow)
 
-    @patch("emr_autoscaling.emr.boto3.client")
+    @patch(f"{MODULE_BASE}.emr.boto3.client")
     def test_get_two_task_instance_groups(self, mock_emr):
         mock_instance_groups = mock_emr.return_value.list_instance_groups
         mock_instance_groups.return_value = {
@@ -130,17 +134,13 @@ class EmrTest(TestCase):
                 }
             ]
         }
-        groups = Emr(job_flow_id = self.job_flow, region = "eu-west-1").get_task_instance_groups()
-        self.assertListEqual (
-            groups,
-            [
-                {"InstanceGroupType": "TASK", "InstanceGroupName": "MyTaskGroup", "BidPrice": 1.2},
-                {"InstanceGroupType": "TASK", "InstanceGroupName": "MyOtherTaskGroup", "BidPrice": 1.2}
-            ]
-        )
-        mock_instance_groups.assert_called_with(ClusterId = self.job_flow)
+        groups = Emr(job_flow_id=self.job_flow, region="eu-west-1").get_task_instance_groups()
+        self.assertListEqual(groups,
+                             [{"InstanceGroupType": "TASK", "InstanceGroupName": "MyTaskGroup", "BidPrice": 1.2},
+                              {"InstanceGroupType": "TASK", "InstanceGroupName": "MyOtherTaskGroup", "BidPrice": 1.2}])
+        mock_instance_groups.assert_called_with(ClusterId=self.job_flow)
 
-    @patch("emr_autoscaling.emr.boto3.client")
+    @patch(f"{MODULE_BASE}.emr.boto3.client")
     def test_get_no_task_instance_group(self, mock_emr):
         mock_instance_groups = mock_emr.return_value.list_instance_groups
         mock_instance_groups.return_value = {
@@ -155,10 +155,10 @@ class EmrTest(TestCase):
                 }
             ]
         }
-        groups = Emr(job_flow_id = self.job_flow, region = "eu-west-1").get_task_instance_groups()
+        groups = Emr(job_flow_id=self.job_flow, region="eu-west-1").get_task_instance_groups()
         self.assertListEqual(groups, [])
 
-    @patch("emr_autoscaling.emr.boto3.client")
+    @patch(f"{MODULE_BASE}.emr.boto3.client")
     def test_dont_get_task_instance_group_without_bid_price(self, mock_emr):
         mock_instance_groups = mock_emr.return_value.list_instance_groups
         mock_instance_groups.return_value = {
@@ -177,10 +177,10 @@ class EmrTest(TestCase):
                 }
             ]
         }
-        groups = Emr(job_flow_id = self.job_flow, region = "eu-west-1").get_task_instance_groups()
+        groups = Emr(job_flow_id=self.job_flow, region="eu-west-1").get_task_instance_groups()
         self.assertListEqual(groups, [])
 
-    @patch("emr_autoscaling.emr.Emr.get_task_instance_groups")
+    @patch(f"{MODULE_BASE}.emr.Emr.get_task_instance_groups")
     def test_upscaling_in_progress(self, mock_get_task_instance_group):
         mock_get_task_instance_group.return_value = [
             {
@@ -190,12 +190,12 @@ class EmrTest(TestCase):
         ]
         self.assertTrue (
             Emr (
-                job_flow_id = self.job_flow,
-                region = "eu-west-1"
+                job_flow_id=self.job_flow,
+                region="eu-west-1"
             ).scaling_in_progress()
         )
 
-    @patch("emr_autoscaling.emr.Emr.get_task_instance_groups")
+    @patch(f"{MODULE_BASE}.emr.Emr.get_task_instance_groups")
     def test_downscaling_in_progress(self, mock_get_task_instance_group):
         mock_get_task_instance_group.return_value = [
             {
@@ -203,14 +203,9 @@ class EmrTest(TestCase):
                 "RunningInstanceCount": 2
             }
         ]
-        self.assertTrue (
-            Emr (
-                job_flow_id = self.job_flow,
-                region = "eu-west-1"
-            ).scaling_in_progress()
-        )
+        self.assertTrue(Emr(job_flow_id=self.job_flow, region="eu-west-1").scaling_in_progress())
 
-    @patch("emr_autoscaling.emr.Emr.get_task_instance_groups")
+    @patch(f"{MODULE_BASE}.emr.Emr.get_task_instance_groups")
     def test_no_scaling_in_progress(self, mock_get_task_instance_group):
         mock_get_task_instance_group.return_value = [
             {
@@ -218,15 +213,10 @@ class EmrTest(TestCase):
                 "RunningInstanceCount": 1
             }
         ]
-        self.assertFalse (
-            Emr (
-                job_flow_id = self.job_flow,
-                region = "eu-west-1"
-            ).scaling_in_progress()
-        )
+        self.assertFalse(Emr(job_flow_id=self.job_flow, region="eu-west-1").scaling_in_progress())
 
-    @patch("emr_autoscaling.emr.boto3.client")
-    @patch("emr_autoscaling.emr.Emr.get_task_instance_groups")
+    @patch(f"{MODULE_BASE}.emr.boto3.client")
+    @patch(f"{MODULE_BASE}.emr.Emr.get_task_instance_groups")
     def test_scaling_because_inner_bounds(self, mock_get_task_instance_group, mock_emr):
         mock_get_task_instance_group.return_value = [
             {
@@ -238,25 +228,20 @@ class EmrTest(TestCase):
             }
         ]
         mock_modify_instance_groups = mock_emr.return_value.modify_instance_groups
-        Emr (
-            job_flow_id = self.job_flow,
-            min_instances = 5,
-            max_instances = 10,
-            region = "eu-west-1"
-        ).scale (
-            direction = 1
-        )
-        mock_modify_instance_groups.assert_called_with (
-            InstanceGroups = [
-                {
-                    "InstanceGroupId": self.emr_task_instance_group_id,
-                    "InstanceCount": 6
-                }
-            ]
-        )
+        Emr(job_flow_id=self.job_flow,
+            min_instances=5,
+            max_instances=10,
+            region="eu-west-1").scale(direction=1)
 
-    @patch("emr_autoscaling.emr.boto3.client")
-    @patch("emr_autoscaling.emr.Emr.get_task_instance_groups")
+        mock_modify_instance_groups.assert_called_with(InstanceGroups=[
+            {
+                "InstanceGroupId": self.emr_task_instance_group_id,
+                "InstanceCount": 6
+            }
+        ])
+
+    @patch(f"{MODULE_BASE}.emr.boto3.client")
+    @patch(f"{MODULE_BASE}.emr.Emr.get_task_instance_groups")
     def test_scaling_up_from_zero_instances(self, mock_get_task_instance_group, mock_emr):
         mock_get_task_instance_group.return_value = [
             {
@@ -285,8 +270,8 @@ class EmrTest(TestCase):
             ]
         )
 
-    @patch("emr_autoscaling.emr.boto3.client")
-    @patch("emr_autoscaling.emr.Emr.get_task_instance_groups")
+    @patch(f"{MODULE_BASE}.emr.boto3.client")
+    @patch(f"{MODULE_BASE}.emr.Emr.get_task_instance_groups")
     def test_scaling_down_from_one_instance(self, mock_get_task_instance_group, mock_emr):
         mock_get_task_instance_group.return_value = [
             {
@@ -315,8 +300,8 @@ class EmrTest(TestCase):
             ]
         )
 
-    @patch("emr_autoscaling.emr.boto3.client")
-    @patch("emr_autoscaling.emr.Emr.get_task_instance_groups")
+    @patch(f"{MODULE_BASE}.emr.boto3.client")
+    @patch(f"{MODULE_BASE}.emr.Emr.get_task_instance_groups")
     def test_no_scaling_because_above_upper_bound(self, mock_get_task_instance_group, mock_emr):
         mock_get_task_instance_group.return_value = [
             {
@@ -338,8 +323,8 @@ class EmrTest(TestCase):
         )
         mock_modify_instance_groups.assert_not_called()
 
-    @patch("emr_autoscaling.emr.boto3.client")
-    @patch("emr_autoscaling.emr.Emr.get_task_instance_groups")
+    @patch(f"{MODULE_BASE}.emr.boto3.client")
+    @patch(f"{MODULE_BASE}.emr.Emr.get_task_instance_groups")
     def test_no_scaling_because_below_lower_bound(self, mock_get_task_instance_group, mock_emr):
         mock_get_task_instance_group.return_value = [
             {
@@ -361,8 +346,8 @@ class EmrTest(TestCase):
         )
         mock_modify_instance_groups.assert_not_called()
 
-    @patch("emr_autoscaling.emr.boto3.client")
-    @patch("emr_autoscaling.emr.Emr.get_task_instance_groups")
+    @patch(f"{MODULE_BASE}.emr.boto3.client")
+    @patch(f"{MODULE_BASE}.emr.Emr.get_task_instance_groups")
     def test_scales_only_once(self, mock_get_task_instance_group, mock_emr):
         mock_get_task_instance_group.return_value = [
             {
@@ -397,7 +382,7 @@ class EmrTest(TestCase):
                 }
             ]
         )
-    @patch("emr_autoscaling.emr.boto3.client")
+    @patch(f"{MODULE_BASE}.emr.boto3.client")
     def test_is_termination_protected_True(self, mock_emr):
         mock_describe_cluster = mock_emr.return_value.describe_cluster
         mock_describe_cluster.return_value = {
@@ -407,7 +392,7 @@ class EmrTest(TestCase):
         }
         self.assertTrue(Emr(job_flow_id=self.job_flow).is_termination_protected())
 
-    @patch("emr_autoscaling.emr.boto3.client")
+    @patch(f"{MODULE_BASE}.emr.boto3.client")
     def test_is_termination_protected_False(self, mock_emr):
         mock_describe_cluster = mock_emr.return_value.describe_cluster
         mock_describe_cluster.return_value = {
@@ -417,5 +402,5 @@ class EmrTest(TestCase):
         }
         self.assertFalse(Emr(job_flow_id=self.job_flow).is_termination_protected())
 
-    def test_is_target_already_reached(self):
-        self.assertFalse(Emr.is_target_count_not_reached(0, 0))
+def test_is_target_already_reached(self):
+    self.assertFalse(Emr.is_target_count_not_reached(0, 0))

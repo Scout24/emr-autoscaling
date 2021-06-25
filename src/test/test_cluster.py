@@ -61,5 +61,6 @@ class TestClusterAndStack:
 
         return response['JobFlowId']
 
+
 if __name__ == '__main__':
     print(TestClusterAndStack.create_emr_test_cluster())
