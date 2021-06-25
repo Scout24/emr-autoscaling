@@ -1,6 +1,0 @@
-region: eu-west-1
-tags:
-  usecase: emr-autoscaling
-stacks:
-  emr-autoscaling:
-    template-url: emr-autoscaling.yaml
