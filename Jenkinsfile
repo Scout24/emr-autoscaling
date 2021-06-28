@@ -35,9 +35,6 @@ pipeline {
                 script {
                     sh '''
                         make package
-                        pwd
-                        ls -la
-                        ls -la ./target
                         aws s3 cp $LOCAL_ZIP_PATH $S3_ZIP_ARTIFACT_PATH
                     '''
                 }
