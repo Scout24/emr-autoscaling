@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+from src.python.emr_autoscaling import utils
 from src.python.emr_autoscaling.emr import Emr
 from src.python.emr_autoscaling.scaler import EmrScaler
 from mock import patch
@@ -172,14 +173,15 @@ class EmrScalerTest(TestCase):
         mock_shutdown.assert_not_called()
 
     def test_is_before_shutdown_time(self):
-        new_time = datetime(2019, 10, 23, 22, 59, 59)
-        new_time = datetime.utcfromtimestamp(new_time.timestamp())
+        new_time = utils.create_berlin_time(datetime(2019, 10, 23, 22, 59, 59))
 
         self.assertFalse(EmrScaler(self.emr).is_after_shutdown_time(new_time))
 
     def test_is_after_shutdown_time(self):
-        new_time = datetime(2019, 10, 23, 23, 0, 1)
-        new_time = datetime.utcfromtimestamp(new_time.timestamp())
+        # 23:00:00 ==> 21:00:00+02
+        # 23:00:01 ==> 23:00:01+02
+
+        new_time = utils.create_berlin_time(datetime(2019, 10, 23, 23, 0, 1))
 
         self.assertTrue(EmrScaler(self.emr).is_after_shutdown_time(new_time))
 

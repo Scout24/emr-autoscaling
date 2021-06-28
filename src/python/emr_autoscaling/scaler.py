@@ -17,9 +17,18 @@ class EmrScaler:
         self.logger = get_logger('EMRScaler')
         self.emr = emr
         self.time_zone = timezone('Europe/Berlin')
+
         #Calculating offset of timezone to subtract from the shutdown time
-        self.time_offset = int(datetime.now(self.time_zone).utcoffset().total_seconds()/60/60)
-        self.shutdown_time = datetime.now(self.time_zone).replace(hour=shutdown_time - self.time_offset, minute=0, second=0, microsecond=0)
+        self.time_offset = int(
+            (datetime
+                .now(self.time_zone)
+                .utcoffset()
+                .total_seconds()) / (60 * 60)
+        )
+        self.shutdown_time = datetime\
+            .now(self.time_zone)\
+            .replace(hour=shutdown_time - self.time_offset, minute=0, second=0, microsecond=0)
+
         self.parent_stack = parent_stack
         self.cloud_formation = boto3.client('cloudformation')
         self.stack_deletion_role = stack_deletion_role
