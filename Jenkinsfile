@@ -21,7 +21,7 @@ pipeline {
         FAST_USER = getFastUser()
 
         ZIP_LAMBDA = "emr_autoscaling.zip"
-        LOCAL_ZIP_PATH = "target/" + "$ZIP_LAMBDA"
+        LOCAL_ZIP_PATH = "./target/" + "$ZIP_LAMBDA"
         VERSION = "v1.0-" + "$INVOKED_BUILD_NUMBER"
 
         S3_ZIP_ARTIFACT_PATH = "s3://is24-data-pro-artifacts/emr/lambda_autoscaling/" + "$VERSION" + "/" + "$ZIP_LAMBDA"
@@ -35,6 +35,7 @@ pipeline {
                 script {
                     sh '''
                         make package
+                        pwd
                         aws s3 cp $LOCAL_ZIP_PATH $S3_ZIP_ARTIFACT_PATH
                     '''
                 }
