@@ -20,7 +20,7 @@ pipeline {
         FAST_TOKEN = getFastToken()
         FAST_USER = getFastUser()
 
-        ZIP_LAMBDA = "emr_autoscaling.zip"
+        ZIP_LAMBDA = "emr-autoscaling.zip"
         LOCAL_ZIP_PATH = "./target/" + "$ZIP_LAMBDA"
         VERSION = "v1.0-" + "$INVOKED_BUILD_NUMBER"
 
