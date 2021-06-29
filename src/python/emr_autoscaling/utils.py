@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from src.python.pytz import timezone
+from ..pytz import timezone
 from logging import getLogger, Formatter, StreamHandler
 
 
