@@ -28,87 +28,31 @@ group for scaling.
 
 # Build
 
-This project is built using [PyBuilder](http://pybuilder.github.io/). To setup your build
+This project is built using Make. To setup your build
 environment simply do the following:
 
 ```bash
-virtualenv -p python2.7 venv
-source venv/bin/activate
-pip install pybuilder
-pyb install_dependencies
+make setup-environment
 ```
 
 To perform a build, i.e. execute unit tests and package the zip file for AWS Lambda:
 
 ```bash
-pyb -X package_lambda_code
+make package
 ```
 
-# Deployment
-## automatic way
-### deploy changes to AWS
-committing changes triggers a teamcity build
+# Deployment to AWS
+Committing changes triggers a Jenkins build
 
-[Link to teamcity build](https://teamcity.rz.is/viewType.html?buildTypeId=DataScience_EmrAutoscaling)
+[Link to the Jenkins build](https://core-data-platform.fizz.cloud.scout24.com/job/Data%20Platform%20Tools/job/EMR%20Auto%20Scaling/)
 
-### update lambda function code
-after the teamcity build has finished, run
-
-
-```aws lambda update-function-code --function-name insights-cluster-AutoscalingStack-ScalingFunction-<CURRENT_ID> --region eu-west-1 --s3-bucket is24-data-pro-artifacts --s3-key emr/lambda_autoscaling/latest/emr-autoscaling.zip```
-
-on aws cli
-
-## semi-manual way
-### Upload Lambda Function to S3
-
-To upload the lambda Function to S3, run the following command with your S3 bucket name:
-
-```bash
-pyb -X -P bucket_name=<S3-bucket-name> upload_zip_to_s3 lambda_release
-```
-
-The `upload_zip_to_s3` part of the above command loads the zip file which has been packaged
-previously into the S3 bucket as specified with the `bucket_name` parameter. The key is
-`emr/lambda_autoscaling/<project-version>/emr-autoscaling.zip`. The `lambda_release` part
-copies the uploaded file from `emr/lambda_autoscaling/<project-version>/emr-autoscaling.zip`
-to `/emr/lambda_autoscaling/latest/emr-autoscaling.zip`.
-
-### (Re-)Deploy Cloudformation Stack
-
-The Cloudformation Stacks are deployed using [cfn-sphere](https://github.com/cfn-sphere/cfn-sphere).
-Since you cannot update lambda functions with Cloudformation (i.e. with new code), it is
-neccessary to recreate the stack.
-
-You can delete an already deployed stack with the following statement:
-
-```bash
-cf delete -c src/main/resources/cfn/stacks.yaml
-```
-
-To deploy the stack - and thus make sure that it uses the latest version of the lambda
-function - you can do the following (replace with your own parameter values):
-
-```bash
-cf sync \
-  -c \
-  --parameter "emr-autoscaling.scalingFunctionCodeBucket=<S3-bucket-name>" \
-  --parameter "emr-autoscaling.emrJobFlowId=<EMR-cluster-id>" \
-  src/main/resources/cfn/stacks.yaml
-```
-
-The function offers a few parameters to customize its behaviour. These are described
-in the next section. You can override the defaults simply by adding
-`--parameter "<parameter-name>=<parameter-value>"` snippets to the above command.
 
 # Parameters
 
+The Function takes 2 sets of parameters:
+
 ## Mandatory Parameters
 
-- scalingFunctionCodeBucket
-    - S3 Bucket into which the scaling function is uploaded
-    - prefix is `/emr/lambda_autoscaling/<project-version>/emr-autoscaling.zip`
-    - in addition the latest version is copied to `/emr/lambda_autoscaling/latest/emr-autoscaling.zip`
 - emrJobFlowId
     - ID of the EMR cluster which is to be scaled
 
