@@ -1,5 +1,5 @@
 from datetime import datetime
-from ..pytz import timezone
+from pytz import timezone
 import boto3
 from .utils import get_logger
 from .constants import UP, DOWN
