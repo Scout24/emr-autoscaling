@@ -8,7 +8,7 @@ setup-environment: ## Prepare local environment for testing purposes, also used 
 
 test: setup-environment ## Run unit tests
 	source venv/bin/activate; \
-	PYTHONPATH=./src python3 -m unittest discover -s src/test/ -p '*_tests.py' -v
+	PYTHONPATH=./app python3 -m unittest discover -s ./tests/ -p '*_tests.py' -v
 
 package: test ## Build deployment package
 	source venv/bin/activate; \

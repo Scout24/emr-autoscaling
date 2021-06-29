@@ -1,8 +1,10 @@
-from datetime import datetime
-from pytz import timezone
 import boto3
-from .utils import get_logger
-from .constants import UP, DOWN
+from datetime import datetime
+
+from pytz import timezone
+
+from emr_autoscaling.utils import get_logger
+from emr_autoscaling.constants import UP, DOWN
 
 
 class EmrScaler:

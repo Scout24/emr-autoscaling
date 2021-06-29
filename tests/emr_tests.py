@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
 
-from src.python.emr_autoscaling.emr import Emr
+from app.emr_autoscaling.emr import Emr
 from mock import patch
 from unittest import TestCase
 
 
-MODULE_BASE = "src.python.emr_autoscaling"
+MODULE_BASE = "app.emr_autoscaling"
 
 
 class EmrTest(TestCase):

@@ -1,13 +1,13 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
-from src.python.emr_autoscaling import utils
-from src.python.emr_autoscaling.emr import Emr
-from src.python.emr_autoscaling.scaler import EmrScaler
+from app.emr_autoscaling import utils
+from app.emr_autoscaling.emr import Emr
+from app.emr_autoscaling.scaler import EmrScaler
 from mock import patch
 from unittest import TestCase
 
 
-MODULE_BASE = "src.python.emr_autoscaling"
+MODULE_BASE = "app.emr_autoscaling"
 
 
 class EmrScalerTest(TestCase):
