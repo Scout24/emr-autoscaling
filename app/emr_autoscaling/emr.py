@@ -1,8 +1,8 @@
 import boto3
 from datetime import datetime, timedelta
 
-from emr_autoscaling.constants import UP
-from emr_autoscaling.utils import get_logger
+from app.emr_autoscaling.constants import UP
+from app.emr_autoscaling.utils import get_logger
 
 import math
 
