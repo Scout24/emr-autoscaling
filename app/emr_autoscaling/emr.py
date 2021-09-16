@@ -1,8 +1,8 @@
 import boto3
 from datetime import datetime, timedelta
 
-from app.emr_autoscaling.constants import UP
-from app.emr_autoscaling.utils import get_logger
+from emr_autoscaling.constants import UP
+from emr_autoscaling.utils import get_logger
 
 import math
 
@@ -14,6 +14,7 @@ class Emr:
         self.max_instances = max_instances
         self.job_flow_id = job_flow_id
         self.logger = get_logger('EMR')
+        self.logger.info("Changing to reflect in lambda")
         if region:
             self.emr = boto3.client("emr", region_name = region)
             self.cloudwatch = boto3.client("cloudwatch", region_name = region)

@@ -1,5 +1,5 @@
-from app.emr_autoscaling.emr import Emr
-from app.emr_autoscaling.scaler import EmrScaler
+from emr_autoscaling.emr import Emr
+from emr_autoscaling.scaler import EmrScaler
 
 
 def lambda_handler(event, context):

@@ -1,7 +1,7 @@
 from datetime import datetime
 from logging import getLogger, Formatter, StreamHandler
 
-from app.pytz import timezone
+from pytz import timezone
 
 
 def get_logger(name, log_level='INFO'):
