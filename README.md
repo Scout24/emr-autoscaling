@@ -35,11 +35,25 @@ environment simply do the following:
 make setup-environment
 ```
 
+To perform tests, execute
+
+```bash
+make test
+```
+
 To perform a build, i.e. execute unit tests and package the zip file for AWS Lambda:
 
 ```bash
 make package
 ```
+
+If you are getting an error in build due AWS region like this: 
+```
+autoscaling/venv/lib/python3.9/site-packages/botocore/regions.py", line 148, in _endpoint_for_partition
+    raise NoRegionError()
+botocore.exceptions.NoRegionError: You must specify a region.
+```
+Please, configure a default region for your AWS CLI using the command ```aws configure``` and follow the steps. Currently, the default region is ```eu-west-1```.
 
 # Deployment to AWS
 Committing changes triggers a Jenkins build
